@@ -15,6 +15,8 @@ import errorController from "./controllers/errorController.js";
 import AppError from "./utils/Error/AppError.js";
 
 // routes
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 
 import { NODE_ENV } from "./config/env.js";
@@ -30,6 +32,8 @@ App.use(cookieparser());
 
 NODE_ENV === "DEV" && App.use(morgan("dev"));
 
+App.use("/api/v1/auth", authRoutes);
+App.use("/api/v1/user", userRoutes);
 App.use("/api/v1/posts", postRoutes);
 
 // Fetch unrecognized routes

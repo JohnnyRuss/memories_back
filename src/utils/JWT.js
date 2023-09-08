@@ -1,8 +1,8 @@
 import {
-  ACCESS_TOKEN_SECRET,
-  REFRESH_TOKEN_SECRET,
   NODE_ENV,
   APP_ORIGINS,
+  ACCESS_TOKEN_SECRET,
+  REFRESH_TOKEN_SECRET,
 } from "../config/env.js";
 import jwt from "jsonwebtoken";
 import { promisify } from "util";
@@ -12,7 +12,6 @@ class JWT {
     const userPayload = {
       _id: payload._id,
       email: payload.email,
-      username: payload.username,
     };
 
     const accessToken = jwt.sign(userPayload, ACCESS_TOKEN_SECRET, {
