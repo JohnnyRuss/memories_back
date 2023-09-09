@@ -12,15 +12,28 @@ export const createPost = Async(async function (req, res, next) {
     image: body.image,
   }).save();
 
+  await post.populate({ path: "author" });
+
   res.status(201).json(post);
 });
 
 export const updatePost = Async(async function (req, res, next) {
-  res.status(201).json("db post update");
+  const { postId } = req.params;
+  const body = req.body;
+
+  const updatedPost = await Post.findByIdAndUpdate(postId, body, {
+    new: true,
+  }).populate({ path: author });
+
+  res.status(201).json(updatedPost);
 });
 
 export const deletePost = Async(async function (req, res, next) {
-  res.status(201).json("db post update");
+  const { postId } = req.params;
+
+  await Post.findByIdAndDelete(postId);
+
+  res.status(201).json("post is deleted");
 });
 
 export const getPost = Async(async function (req, res, next) {
@@ -42,11 +55,11 @@ export const reactOnPost = Async(async function (req, res, next) {
       (reaction) => reaction.toString() !== currentUser._id
     );
 
-    post.likeCount += 1;
+    post.likeCount -= 1;
   } else {
     post.likes = [...post.likes, currentUser._id];
 
-    post.likeCount -= 1;
+    post.likeCount += 1;
   }
 
   await post.save();
@@ -55,6 +68,6 @@ export const reactOnPost = Async(async function (req, res, next) {
 });
 
 export const getAllPosts = Async(async function (req, res, next) {
-  const posts = await Post.find();
+  const posts = await Post.find().populate({ path: "author" });
   res.status(200).json(posts);
 });
