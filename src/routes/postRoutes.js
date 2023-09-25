@@ -8,6 +8,8 @@ Router.route("/")
   .get(postController.getAllPosts)
   .post(checkAuth, postController.createPost);
 
+Router.route("/search").get(postController.searchPosts);
+
 Router.route("/:postId")
   .put(checkAuth, postController.updatePost)
   .delete(checkAuth, postController.deletePost)

@@ -68,6 +68,24 @@ export const reactOnPost = Async(async function (req, res, next) {
 });
 
 export const getAllPosts = Async(async function (req, res, next) {
-  const posts = await Post.find().populate({ path: "author" });
+  const posts = await Post.find()
+    .populate({ path: "author" })
+    .sort("-createdAt");
+  res.status(200).json(posts);
+});
+
+export const searchPosts = Async(async function (req, res, next) {
+  const { search, tags } = req.query;
+
+  const queryArray = [];
+
+  if (search) queryArray.push({ title: { $regex: search, $options: "i" } });
+
+  if (tags) queryArray.push({ tags: { $in: tags?.split(",") } });
+
+  const posts = await Post.find({
+    $or: queryArray,
+  });
+
   res.status(200).json(posts);
 });
