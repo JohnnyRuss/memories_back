@@ -1,5 +1,6 @@
 import Async from "../utils/Async.js";
 import Post from "../models/Post.js";
+import AppError from "../utils/Error/AppError.js";
 
 export const createPost = Async(async function (req, res, next) {
   const body = req.body;
@@ -37,7 +38,13 @@ export const deletePost = Async(async function (req, res, next) {
 });
 
 export const getPost = Async(async function (req, res, next) {
-  res.status(201).json("db post update");
+  const { postId } = req.params;
+
+  const post = await Post.findById(postId).populate({ path: "author" });
+
+  if (!post) return next(new AppError(404, "post does not exists"));
+
+  res.status(200).json(post);
 });
 
 export const reactOnPost = Async(async function (req, res, next) {
@@ -68,13 +75,58 @@ export const reactOnPost = Async(async function (req, res, next) {
 });
 
 export const getAllPosts = Async(async function (req, res, next) {
-  const posts = await Post.find()
+  const queryArray = generateQueryArray(req);
+
+  const { pageLimit, skip, currentPage } = controlPagination(req);
+
+  const total = await Post.find(
+    queryArray[0] && { $or: queryArray }
+  ).countDocuments();
+
+  const numberOfPages = Math.ceil(total / pageLimit);
+
+  const posts = await Post.find(queryArray[0] && { $or: queryArray })
+    .skip(skip)
+    .limit(pageLimit)
     .populate({ path: "author" })
     .sort("-createdAt");
-  res.status(200).json(posts);
+
+  res.status(200).json({
+    data: posts,
+    total,
+    currentPage,
+    numberOfPages,
+  });
 });
 
 export const searchPosts = Async(async function (req, res, next) {
+  const queryArray = generateQueryArray(req);
+
+  const { pageLimit, skip, currentPage } = controlPagination(req);
+
+  const total = await Post.find({
+    $or: queryArray,
+  }).countDocuments();
+
+  const numberOfPages = Math.ceil(total / pageLimit);
+
+  const posts = await Post.find({
+    $or: queryArray,
+  })
+    .skip(skip)
+    .limit(pageLimit)
+    .populate({ path: "author" })
+    .sort("-createdAt");
+
+  res.status(200).json({
+    data: posts,
+    total,
+    currentPage,
+    numberOfPages,
+  });
+});
+
+function generateQueryArray(req) {
   const { search, tags } = req.query;
 
   const queryArray = [];
@@ -83,9 +135,15 @@ export const searchPosts = Async(async function (req, res, next) {
 
   if (tags) queryArray.push({ tags: { $in: tags?.split(",") } });
 
-  const posts = await Post.find({
-    $or: queryArray,
-  });
+  return queryArray;
+}
 
-  res.status(200).json(posts);
-});
+function controlPagination(req) {
+  const { page, limit } = req.query;
+
+  const pageLimit = +limit || 3;
+  const currentPage = +page || 1;
+  const skip = (currentPage - 1) * pageLimit;
+
+  return { pageLimit, skip, currentPage };
+}
