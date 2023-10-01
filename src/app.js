@@ -18,6 +18,7 @@ import AppError from "./utils/Error/AppError.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
+import commentRoutes from "./routes/commentRoutes.js";
 
 import { NODE_ENV } from "./config/env.js";
 
@@ -35,6 +36,7 @@ NODE_ENV === "DEV" && App.use(morgan("dev"));
 App.use("/api/v1/auth", authRoutes);
 App.use("/api/v1/user", userRoutes);
 App.use("/api/v1/posts", postRoutes);
+App.use("/api/v1/comments", commentRoutes);
 
 // Fetch unrecognized routes
 App.all("*", (req, _, next) => {
