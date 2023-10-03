@@ -1,5 +1,6 @@
 import Async from "../utils/Async.js";
 import Post from "../models/Post.js";
+import Comment from "../models/Comment.js";
 import AppError from "../utils/Error/AppError.js";
 
 export const createPost = Async(async function (req, res, next) {
@@ -24,7 +25,7 @@ export const updatePost = Async(async function (req, res, next) {
 
   const updatedPost = await Post.findByIdAndUpdate(postId, body, {
     new: true,
-  }).populate({ path: author });
+  }).populate({ path: "author" });
 
   res.status(201).json(updatedPost);
 });
@@ -33,6 +34,7 @@ export const deletePost = Async(async function (req, res, next) {
   const { postId } = req.params;
 
   await Post.findByIdAndDelete(postId);
+  await Comment.deleteMany({ post: postId });
 
   res.status(201).json("post is deleted");
 });

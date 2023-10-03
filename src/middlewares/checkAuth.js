@@ -24,7 +24,7 @@ export const checkAuth = Async(async function (req, res, next) {
   if (!isUserExists) return next(new AppError(403, "User does not exists"));
 
   const user = {
-    _id: isUserExists._id,
+    _id: isUserExists._id.toString(),
     email: isUserExists.email,
   };
 

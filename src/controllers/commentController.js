@@ -62,7 +62,10 @@ export const reactOnComment = Async(async (req, res, next) => {
   const { commentId } = req.params;
   const currentUser = req.user;
 
-  const comment = await Comment.findByIdAndDelete(commentId);
+  const comment = await Comment.findById(commentId).populate({
+    path: "author",
+    select: "name",
+  });
 
   if (!comment) return next(new AppError(404, "comment does not exists"));
 
