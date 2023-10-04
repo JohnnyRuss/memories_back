@@ -135,7 +135,10 @@ function generateQueryArray(req) {
 
   if (search) queryArray.push({ title: { $regex: search, $options: "i" } });
 
-  if (tags) queryArray.push({ tags: { $in: tags?.split(",") } });
+  if (tags)
+    queryArray.push({
+      tags: { $in: tags?.split(",").map((tag) => new RegExp(tag, "i")) },
+    });
 
   return queryArray;
 }
