@@ -10,6 +10,13 @@ Router.route("/")
 
 Router.route("/search").get(postController.searchPosts);
 
+Router.route("/:userId/memories").get(postController.getMemoriesByUser);
+Router.route("/:userId/liked-memories").get(
+  postController.getUserLikedMemories
+);
+
+Router.route("/search").get(postController.searchPosts);
+
 Router.route("/:postId")
   .put(checkAuth, postController.updatePost)
   .delete(checkAuth, postController.deletePost)
