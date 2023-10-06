@@ -131,9 +131,11 @@ export const searchPosts = Async(async function (req, res, next) {
 export const getMemoriesByUser = Async(async function (req, res, next) {
   const { userId } = req.params;
 
-  const posts = await Post.find({ author: userId }).populate({
-    path: "author",
-  });
+  const posts = await Post.find({ author: userId })
+    .populate({
+      path: "author",
+    })
+    .sort({ createdAt: -1 });
 
   res.status(200).json(posts);
 });
@@ -141,9 +143,11 @@ export const getMemoriesByUser = Async(async function (req, res, next) {
 export const getUserLikedMemories = Async(async function (req, res, next) {
   const { userId } = req.params;
 
-  const posts = await Post.find({ likes: userId }).populate({
-    path: "author",
-  });
+  const posts = await Post.find({ likes: userId })
+    .populate({
+      path: "author",
+    })
+    .sort({ createdAt: -1 });
 
   res.status(200).json(posts);
 });

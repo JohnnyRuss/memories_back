@@ -34,7 +34,7 @@ App.use(cookieparser());
 NODE_ENV === "DEV" && App.use(morgan("dev"));
 
 App.use("/api/v1/auth", authRoutes);
-App.use("/api/v1/user", userRoutes);
+App.use("/api/v1/users", userRoutes);
 App.use("/api/v1/posts", postRoutes);
 App.use("/api/v1/comments", commentRoutes);
 
