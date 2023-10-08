@@ -49,17 +49,45 @@ export const loginUser = Async(async function (req, res, next) {
 
   user.password = undefined;
 
-  const { accessToken } = JWT.assignToken({
-    payload: {
+  const { accessToken } = JWT.assignToken(
+    {
       _id: user._id,
       email: user.email,
     },
-    res,
-  });
+    res
+  );
 
   res.status(200).json({ user, accessToken });
 });
 
 export const logoutUser = Async(async function (req, res, next) {
-  res.status(200).json("db response");
+  res.clearCookie("authorization");
+  res.status(204).json("user logged out");
+});
+
+export const refresh = Async(async (req, res, next) => {
+  const { authorization } = req.cookies;
+
+  if (!authorization) return next(new AppError(401, "you are not authorized"));
+
+  const verifiedToken = await JWT.verifyToken({
+    token: authorization,
+    refreshToken: true,
+  });
+
+  if (!verifiedToken)
+    return next(new AppError(401, "user does not exists.invalid credentials"));
+
+  const user = await User.findById(verifiedToken._id);
+
+  if (!user) return next(new AppError(404, "user does not exists"));
+
+  const userData = {
+    _id: user._id,
+    email: user.email,
+  };
+
+  const { accessToken } = JWT.assignToken(userData, res);
+
+  res.status(201).json({ accessToken });
 });

@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 import { promisify } from "util";
 
 class JWT {
-  assignToken({ payload, res }) {
+  assignToken(payload, res) {
     const userPayload = {
       _id: payload._id,
       email: payload.email,
@@ -21,7 +21,6 @@ class JWT {
     const refreshToken = jwt.sign(userPayload, REFRESH_TOKEN_SECRET);
 
     const cookieOptions = {
-      secure: false,
       httpOnly: true,
       sameSite: "none",
       origin: APP_ORIGINS,
@@ -29,7 +28,7 @@ class JWT {
 
     if (NODE_ENV !== "DEV") cookieOptions.secure = true;
 
-    res.cookie("authorization", refreshToken, cookieOptions);
+    res.cookie("authorization", refreshToken);
 
     return { accessToken };
   }

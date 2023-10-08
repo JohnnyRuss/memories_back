@@ -9,4 +9,6 @@ Router.route("/login").post(authController.loginUser);
 
 Router.route("/logout").post(authController.logoutUser);
 
+Router.route("/refresh").post(authController.refresh);
+
 export default Router;
